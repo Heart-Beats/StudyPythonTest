@@ -2,13 +2,35 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import sys
 
+system_filter_command = 'grep'
 personal_model = '"study"'
 commit_name = '"update btaudio"'
-git_status_str = 'git status |find ' + personal_model
+
+git_status_str = 'git status |' + system_filter_command + ' ' + personal_model
 git_commit_str = 'git commit -m ' + commit_name
 git_push_str = ''
 matchStr = r':\s+'
+
+
+def init_system_info():
+    global system_filter_command
+    global git_status_str
+    if 'win' in sys.platform:
+        system_filter_command = 'find'
+    git_status_str = 'git status |' + system_filter_command + ' ' + personal_model
+
+
+def get_input_arg():
+    global personal_model
+    global git_status_str
+    if len(sys.argv) == 2:
+        personal_model = '\"%s\"' % sys.argv[1]
+    if len(sys.argv) > 2:
+        print('本脚本不支持两个及以上的命令行参数')
+        sys.exit(0)
+    git_status_str = 'git status |' + system_filter_command + ' ' + personal_model
 
 
 def get_change_file_list1(output_list):
@@ -41,7 +63,7 @@ def git_add(file_list):
     for file in file_list:
         git_add_str = 'git add ' + file
         os.popen(git_add_str)
-    print(os.popen('git status').read())
+    print(os.popen('git status',).read())
 
 
 def git_commit():
@@ -59,4 +81,6 @@ def fast_push_personal_module():
     git_push()
 
 
+init_system_info()
+get_input_arg()
 fast_push_personal_module()
